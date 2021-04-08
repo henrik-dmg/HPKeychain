@@ -4,15 +4,6 @@ import XCTest
 final class HPKeychainTests: XCTestCase {
 
 	private let genericCredentials = Credentials(username: "hpanhans", password: "someTestingPassword", credentialType: .generic(service: "com.henrikpanhans.HPKeychain"))
-//
-//	override class func setUp() {
-//		super.setUp()
-//		do {
-//			try KeychainManager.shared.deleteCredentials(for: .generic(service: "com.henrikpanhans.HPKeychain"))
-//		} catch let error {
-//			XCTFail(error.localizedDescription)
-//		}
-//	}
 
 	func testAAddingKeychainItem() {
 		XCTAssertNoThrow(try KeychainManager.shared.storeCredentials(genericCredentials))
