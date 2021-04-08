@@ -67,11 +67,11 @@ public struct Credentials: KeychainCredentials {
 		}
 	}
 
-	public func makeUpdatedCredentials(username: String? = nil, password: String? = nil, credentialType: CredentialType? = nil, additionalPayload: CredentialPayloadable? = nil) -> Credentials {
+	public func makeUpdatedCredentials(username: String? = nil, password: String? = nil, additionalPayload: CredentialPayloadable? = nil) -> Credentials {
 		Credentials(
 			username: username ?? self.username,
 			password: password ?? self.password,
-			credentialType: credentialType ?? self.credentialType,
+			credentialType: self.credentialType,
 			additionalPayload: additionalPayload ?? self.additionalPayload
 		)
 	}

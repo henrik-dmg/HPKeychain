@@ -6,7 +6,7 @@ public struct KeychainManager {
 
     public static let shared = KeychainManager()
 
-	public func storeCredentials<C: KeychainCredentials>(_ credentials: C) throws {
+	public func storeCredentials(_ credentials: Credentials) throws {
 		let attributes = try credentials.makeAttributes()
 		let query = credentials.credentialType.makeQuery()
 
@@ -20,7 +20,7 @@ public struct KeychainManager {
 		}
     }
 
-    public func updateCredentials<C: KeychainCredentials>(_ credentials: C) throws {
+    public func updateCredentials(_ credentials: Credentials) throws {
 		let attributes = try credentials.makeAttributes()
 		let query = credentials.credentialType.makeQuery()
 
@@ -42,7 +42,7 @@ public struct KeychainManager {
 		}
     }
 
-	public func fetchCredentials<C: KeychainCredentials>(for credentialType: CredentialType) throws -> C {
+	public func fetchCredentials(for credentialType: CredentialType) throws -> Credentials {
 		let query: [String: Any] = [
 			kSecMatchLimit as String: kSecMatchLimitOne,
 			kSecReturnAttributes as String: true,
@@ -67,7 +67,7 @@ public struct KeychainManager {
 		else {
 			throw KeychainError.invalidItem
 		}
-		return C(username: account, password: password, credentialType: credentialType, additionalPayload: nil)
+		return Credentials(username: account, password: password, credentialType: credentialType, additionalPayload: nil)
     }
 
 }

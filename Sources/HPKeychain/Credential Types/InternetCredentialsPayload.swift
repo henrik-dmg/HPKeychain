@@ -1,10 +1,10 @@
 import Foundation
 
-public struct InternetCredentialsPayload: CredentialPayloadable {
+struct InternetCredentialsPayload: CredentialPayloadable {
 
 	// MARK: - Nested Types
 
-	public enum AuthenticationType {
+	enum AuthenticationType {
 		/// Windows NT LAN Manager authentication.
 		case ntlm
 		/// Microsoft Network default authentication.
@@ -44,7 +44,7 @@ public struct InternetCredentialsPayload: CredentialPayloadable {
 		}
 	}
 
-	public enum ServerProtocol {
+	enum ServerProtocol {
 		/// FTP protocol.
 		case ftp
 		/// A client side FTP account.
@@ -179,27 +179,27 @@ public struct InternetCredentialsPayload: CredentialPayloadable {
 	// MARK: - Properties
 
     //public let access (macOS only)
-    public let AccessGroup: String? //(iOS; also macOS if kSecAttrSynchronizable specified)
-    public let Accessible: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
-    public let creationDate: Date?
-    public let modificationDate: Date?
-    public let description: String?
-    public let comment: String?
-    public let creator: CFNumber?
-    public let itemType: CFNumber?
-    public let label: String?
-    public let isInvisible: Bool?
-    public let isNegative: Bool?
-    public let securityDomain: String?
-    public let serverProtocol: ServerProtocol?
-    public let authenticationType: AuthenticationType?
-    public let port: CFNumber?
-    public let path: String?
-    public let synchronizable: Bool
+    let AccessGroup: String? //(iOS; also macOS if kSecAttrSynchronizable specified)
+    let Accessible: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
+    let creationDate: Date?
+    let modificationDate: Date?
+    let description: String?
+    let comment: String?
+    let creator: CFNumber?
+    let itemType: CFNumber?
+    let label: String?
+    let isInvisible: Bool?
+    let isNegative: Bool?
+    let securityDomain: String?
+    let serverProtocol: ServerProtocol?
+    let authenticationType: AuthenticationType?
+    let port: CFNumber?
+    let path: String?
+    let synchronizable: Bool
 
     // MARK: - Init
 
-    public init(
+    init(
         AccessGroup: String? = nil,
         Accessible: String? = nil,
         creationDate: Date? = nil,
@@ -239,7 +239,7 @@ public struct InternetCredentialsPayload: CredentialPayloadable {
 
 	// MARK: - CredentialsPayload
 
-	public func makePayload() -> [String : Any] {
+	func makePayload() -> [String : Any] {
 		[:] // TODO
 	}
 

@@ -1,23 +1,23 @@
 import Foundation
 
-public struct GenericCredentialsPayload: CredentialPayloadable {
+struct GenericCredentialsPayload: CredentialPayloadable {
 
 	//public let Access: String // macOS only
-	public let accessControl: SecAccessControl?
-	public let AccessGroup: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
-	public let Accessible: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
-	public let creationDate: Date?
-	public let modificationDate: Date?
-	public let description: String?
-	public let comment: String?
-	public let creator: CFNumber?
-	public let itemType: CFNumber?
-	public let label: String?
-	public let isInvisible: Bool?
-	public let isNegative: Bool?
-	public let synchronizable: Bool
+	let accessControl: SecAccessControl?
+	let AccessGroup: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
+	let Accessible: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
+	let creationDate: Date?
+	let modificationDate: Date?
+	let description: String?
+	let comment: String?
+	let creator: CFNumber?
+	let itemType: CFNumber?
+	let label: String?
+	let isInvisible: Bool?
+	let isNegative: Bool?
+	let synchronizable: Bool
 
-	public init(
+	init(
 		accessControl: SecAccessControl? = nil,
 		AccessGroup: String? = nil,
 		Accessible: String? = nil,
@@ -47,7 +47,7 @@ public struct GenericCredentialsPayload: CredentialPayloadable {
 		self.synchronizable = synchronizable
 	}
 
-	public func makePayload() -> [String : Any] {
+	func makePayload() -> [String : Any] {
 		// TODO
 		[:]
 	}
