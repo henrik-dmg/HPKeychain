@@ -6,9 +6,9 @@ public struct KeychainManager {
 
     public static let shared = KeychainManager()
 
-	public func storeCredentials(_ credentials: Credentials) throws {
-		let attributes = try credentials.makeAttributes()
-		let query = credentials.credentialType.makeQuery()
+	public func storeCredential(_ credential: Credential) throws {
+		let attributes = try credential.makeAttributes()
+		let query = credential.credentialType.makeQuery()
 
 		let completeQuery = query.hp_mergingKeepingOldValues(attributes)
 
@@ -20,9 +20,9 @@ public struct KeychainManager {
 		}
     }
 
-    public func updateCredentials(_ credentials: Credentials) throws {
-		let attributes = try credentials.makeAttributes()
-		let query = credentials.credentialType.makeQuery()
+    public func updateCredential(_ credential: Credential) throws {
+		let attributes = try credential.makeAttributes()
+		let query = credential.credentialType.makeQuery()
 
 		let status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
 		guard status != errSecItemNotFound else {
@@ -33,7 +33,7 @@ public struct KeychainManager {
 		}
     }
 
-    public func deleteCredentials(for credentialType: CredentialType) throws {
+    public func deleteCredential(for credentialType: CredentialType) throws {
 		let query = credentialType.makeQuery()
 
 		let status = SecItemDelete(query as CFDictionary)
@@ -42,7 +42,7 @@ public struct KeychainManager {
 		}
     }
 
-	public func fetchCredentials(for credentialType: CredentialType) throws -> Credentials {
+	public func fetchCredential(for credentialType: CredentialType) throws -> Credential {
 		let query: [String: Any] = [
 			kSecMatchLimit as String: kSecMatchLimitOne,
 			kSecReturnAttributes as String: true,
@@ -67,7 +67,7 @@ public struct KeychainManager {
 		else {
 			throw KeychainError.invalidItem
 		}
-		return Credentials(username: account, password: password, credentialType: credentialType, additionalPayload: nil)
+		return Credential(username: account, password: password, credentialType: credentialType, additionalPayload: nil)
     }
 
 }

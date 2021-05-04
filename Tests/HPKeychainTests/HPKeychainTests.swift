@@ -3,14 +3,14 @@ import XCTest
 
 final class HPKeychainTests: XCTestCase {
 
-	private let genericCredentials = Credentials(username: "hpanhans", password: "someTestingPassword", credentialType: .generic(service: "com.henrikpanhans.HPKeychain"))
+	private let genericCredentials = Credential(username: "hpanhans", password: "someTestingPassword", credentialType: .generic(service: "com.henrikpanhans.HPKeychain"))
 
 	func testAAddingKeychainItem() {
-		XCTAssertNoThrow(try KeychainManager.shared.storeCredentials(genericCredentials))
+		XCTAssertNoThrow(try KeychainManager.shared.storeCredential(genericCredentials))
 	}
 
 	func testBFetching() throws {
-		let storedCredentials: Credentials = try KeychainManager.shared.fetchCredentials(for: genericCredentials.credentialType)
+		let storedCredentials: Credential = try KeychainManager.shared.fetchCredential(for: genericCredentials.credentialType)
 
 		XCTAssertEqual(storedCredentials.username, genericCredentials.username)
 		XCTAssertEqual(storedCredentials.password, genericCredentials.password)
@@ -22,8 +22,8 @@ final class HPKeychainTests: XCTestCase {
 
 		XCTAssertNotEqual(updatedCredentials.username, genericCredentials.username)
 
-		try KeychainManager.shared.updateCredentials(updatedCredentials)
-		let storedCredentials: Credentials = try KeychainManager.shared.fetchCredentials(for: genericCredentials.credentialType)
+		try KeychainManager.shared.updateCredential(updatedCredentials)
+		let storedCredentials: Credential = try KeychainManager.shared.fetchCredential(for: genericCredentials.credentialType)
 
 		XCTAssertEqual(storedCredentials.username, updatedCredentials.username)
 		XCTAssertEqual(storedCredentials.password, updatedCredentials.password)
@@ -31,7 +31,7 @@ final class HPKeychainTests: XCTestCase {
 	}
 
 	func testDDeleting() throws {
-		try KeychainManager.shared.deleteCredentials(for: genericCredentials.credentialType)
+		try KeychainManager.shared.deleteCredential(for: genericCredentials.credentialType)
 	}
 
 }

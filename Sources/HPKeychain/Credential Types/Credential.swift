@@ -12,12 +12,12 @@ public enum CredentialType: Equatable {
 		case .generic(let service):
 			return [
 				kSecClass as String: kSecClassGenericPassword,
-				kSecAttrService as String: service,
+				kSecAttrService as String: service
 			]
 		case .internetPassword(let server):
 			return [
 				kSecClass as String: kSecClassInternetPassword,
-				kSecAttrServer as String: server,
+				kSecAttrServer as String: server
 			]
 		}
 	}
@@ -30,7 +30,7 @@ public protocol CredentialPayloadable {
 
 }
 
-public struct Credentials: KeychainCredentials {
+public struct Credential: KeychainCredentials {
 
 	// MARK: - Properties
 
@@ -50,7 +50,7 @@ public struct Credentials: KeychainCredentials {
 
 	// MARK: - KeychainCredentials
 
-	public func makeAttributes() throws -> [String : Any] {
+	public func makeAttributes() throws -> [String: Any] {
 		guard let passwordData = password.data(using: .utf8) else {
 			throw KeychainError.unableToCreatePasswordData
 		}
@@ -67,8 +67,8 @@ public struct Credentials: KeychainCredentials {
 		}
 	}
 
-	public func makeUpdatedCredentials(username: String? = nil, password: String? = nil, additionalPayload: CredentialPayloadable? = nil) -> Credentials {
-		Credentials(
+	public func makeUpdatedCredentials(username: String? = nil, password: String? = nil, additionalPayload: CredentialPayloadable? = nil) -> Credential {
+		Credential(
 			username: username ?? self.username,
 			password: password ?? self.password,
 			credentialType: self.credentialType,

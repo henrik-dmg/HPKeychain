@@ -178,8 +178,8 @@ struct InternetCredentialsPayload: CredentialPayloadable {
 
 	// MARK: - Properties
 
-    //public let access (macOS only)
-    let AccessGroup: String? //(iOS; also macOS if kSecAttrSynchronizable specified)
+    // public let access (macOS only)
+    let AccessGroup: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
     let Accessible: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
     let creationDate: Date?
     let modificationDate: Date?
@@ -216,8 +216,7 @@ struct InternetCredentialsPayload: CredentialPayloadable {
         authenticationType: InternetCredentialsPayload.AuthenticationType? = nil,
         port: CFNumber? = nil,
         path: String? = nil,
-        synchronizable: Bool = false)
-    {
+        synchronizable: Bool = false) {
         self.AccessGroup = AccessGroup
         self.Accessible = Accessible
         self.creationDate = creationDate
@@ -239,7 +238,7 @@ struct InternetCredentialsPayload: CredentialPayloadable {
 
 	// MARK: - CredentialsPayload
 
-	func makePayload() -> [String : Any] {
+	func makePayload() -> [String: Any] {
 		[:] // TODO
 	}
 

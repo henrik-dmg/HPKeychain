@@ -2,7 +2,7 @@ import Foundation
 
 struct GenericCredentialsPayload: CredentialPayloadable {
 
-	//public let Access: String // macOS only
+	// public let Access: String // macOS only
 	let accessControl: SecAccessControl?
 	let AccessGroup: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
 	let Accessible: String? // (iOS; also macOS if kSecAttrSynchronizable specified)
@@ -47,7 +47,7 @@ struct GenericCredentialsPayload: CredentialPayloadable {
 		self.synchronizable = synchronizable
 	}
 
-	func makePayload() -> [String : Any] {
+	func makePayload() -> [String: Any] {
 		// TODO
 		[:]
 	}
