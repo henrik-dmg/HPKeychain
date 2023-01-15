@@ -23,13 +23,13 @@ public struct InternetPasswordQuery: CredentialQuery {
         Server(server)
     }
 
-    public func credential(from attributes: NSDictionary) throws -> Credential? {
+    public func credential(from attributes: NSDictionary) throws -> Credential {
         guard
             let server = attributes[kSecAttrServer as String] as? String, server == self.server,
             let username = attributes[kSecAttrAccount as String] as? String,
             let passwordData = attributes[kSecValueData as String] as? Data
         else {
-            return nil
+            throw KeychainError.invalidItem
         }
         return Credential(username: username, password: passwordData)
     }

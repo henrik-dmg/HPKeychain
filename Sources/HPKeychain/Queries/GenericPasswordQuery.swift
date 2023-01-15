@@ -23,13 +23,13 @@ public struct GenericPasswordQuery: CredentialQuery {
         Service(serviceIdentifier)
     }
 
-    public func credential(from attributes: NSDictionary) throws -> Credential? {
+    public func credential(from attributes: NSDictionary) throws -> Credential {
         guard
             let serviceIdentifier = attributes[kSecAttrService as String] as? String, serviceIdentifier == self.serviceIdentifier,
             let username = attributes[kSecAttrAccount as String] as? String,
             let passwordData = attributes[kSecValueData as String] as? Data
         else {
-            return nil
+            throw KeychainError.invalidItem
         }
         return Credential(username: username, password: passwordData)
     }
