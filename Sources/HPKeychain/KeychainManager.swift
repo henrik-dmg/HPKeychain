@@ -6,68 +6,80 @@ public struct KeychainManager {
 
     public static let shared = KeychainManager()
 
-	public func storeCredential(_ credential: Credential) throws {
-		let attributes = try credential.makeAttributes()
-		let query = credential.credentialType.makeQuery()
+    public func save(_ credential: Credential, for query: any CredentialQuery) throws {
+        let attributes = try credential.attributes()
+        var completeQuery = attributes
 
-		let completeQuery = query.hp_mergingKeepingOldValues(attributes)
+        for queryItem in try query.queryItems() {
+            completeQuery[queryItem.key] = queryItem.value
+        }
 
-		assert(completeQuery.keys.count == attributes.keys.count + query.keys.count)
-
-		let status = SecItemAdd(completeQuery as CFDictionary, nil)
-		guard status == errSecSuccess else {
-			throw KeychainError.errorWithOSStatus(status)
-		}
+        let status = SecItemAdd(completeQuery as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            throw KeychainError.errorWithOSStatus(status)
+        }
     }
 
-    public func updateCredential(_ credential: Credential) throws {
-		let attributes = try credential.makeAttributes()
-		let query = credential.credentialType.makeQuery()
+    public func update(_ credential: Credential, for query: any CredentialQuery) throws {
+        let attributes = try credential.attributes()
+        var completeQuery = [String: AnyObject]()
 
-		let status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
-		guard status != errSecItemNotFound else {
-			throw KeychainError.noItem
-		}
-		guard status == errSecSuccess else {
-			throw KeychainError.errorWithOSStatus(status)
-		}
+        for queryItem in try query.queryItems() {
+            completeQuery[queryItem.key] = queryItem.value
+        }
+
+        let status = SecItemUpdate(completeQuery as CFDictionary, attributes as CFDictionary)
+        guard status != errSecItemNotFound else {
+            throw KeychainError.noItem
+        }
+        guard status == errSecSuccess else {
+            throw KeychainError.errorWithOSStatus(status)
+        }
     }
 
-    public func deleteCredential(for credentialType: CredentialType) throws {
-		let query = credentialType.makeQuery()
+    public func deleteCredential(with query: any CredentialQuery) throws {
+        var completeQuery = [String: AnyObject]()
 
-		let status = SecItemDelete(query as CFDictionary)
-		guard status == errSecSuccess || status == errSecItemNotFound else {
-			throw KeychainError.errorWithOSStatus(status)
-		}
+        for queryItem in try query.queryItems() {
+            completeQuery[queryItem.key] = queryItem.value
+        }
+
+        let status = SecItemDelete(completeQuery as CFDictionary)
+        guard status == errSecSuccess || status == errSecItemNotFound else {
+            throw KeychainError.errorWithOSStatus(status)
+        }
     }
 
-	public func fetchCredential(for credentialType: CredentialType) throws -> Credential {
-		let query: [String: Any] = [
-			kSecMatchLimit as String: kSecMatchLimitOne,
-			kSecReturnAttributes as String: true,
-			kSecReturnData as String: true
-		].hp_mergingKeepingOldValues(credentialType.makeQuery())
+    public func credentials<C: Credential>(for query: any CredentialQuery<C>) throws -> [C] {
+        var completeQuery: [String: AnyObject] = [
+            kSecReturnPersistentRef as String: kCFBooleanTrue,
+            kSecReturnAttributes as String: kCFBooleanTrue,
+            kSecReturnData as String: kCFBooleanTrue,
+        ]
 
-		var item: CFTypeRef?
-		let status: OSStatus = SecItemCopyMatching(query as CFDictionary, &item)
+        for queryItem in try query.queryItems() {
+            completeQuery[queryItem.key] = queryItem.value
+        }
 
-		guard status != errSecItemNotFound else {
-			throw KeychainError.noItem
-		}
-		guard status == errSecSuccess else {
-			throw KeychainError.errorWithOSStatus(status)
-		}
+        var result: AnyObject?
+        let resultCode = withUnsafeMutablePointer(to: &result) {
+            SecItemCopyMatching(completeQuery as CFDictionary, $0)
+        }
 
-		guard
-			let existingItem = item as? [String: Any],
-			let passwordData = existingItem[kSecValueData as String] as? Data,
-			let password = String(data: passwordData, encoding: String.Encoding.utf8),
-			let account = existingItem[kSecAttrAccount as String] as? String
-		else {
-			throw KeychainError.invalidItem
-		}
-		return Credential(username: account, password: password, credentialType: credentialType, additionalPayload: nil)
+        if resultCode == errSecItemNotFound {
+            // Not finding any keychain items is not an error in this case. Return an empty array.
+            return []
+        }
+        guard resultCode == errSecSuccess else {
+            throw KeychainError.errorWithOSStatus(resultCode)
+        }
+        if let keychainItems = result as? [NSDictionary] {
+            return try keychainItems.map { try query.credential(from: $0) }
+        } else if let keychainItem = result as? NSDictionary {
+            return [try query.credential(from: keychainItem)]
+        } else {
+            throw KeychainError.invalidItem
+        }
     }
 
 }
