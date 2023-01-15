@@ -17,6 +17,8 @@ public struct InternetPasswordClass: QueryItem {
         kSecClassInternetPassword
     }
 
+    public init() {}
+
 }
 
 public struct GenericPasswordClass: QueryItem {
@@ -28,6 +30,8 @@ public struct GenericPasswordClass: QueryItem {
     public var value: AnyObject? {
         kSecClassGenericPassword
     }
+
+    public init() {}
 
 }
 
