@@ -1,40 +1,65 @@
-import XCTest
+import Foundation
+import Testing
+
 @testable import HPKeychain
 
-final class HPKeychainTests: XCTestCase {
+struct HPKeychainTests {
 
     let credential = UsernamePasswordCredential(username: "hpanhans", password: "someTestingPassword".data(using: .utf8)!)
-    let query = GenericPasswordQuery(serviceIdentifier: "dev.panhans.HPKeychain")
 
-	func testAAddingKeychainItem() {
-        XCTAssertNoThrow(try KeychainManager.shared.save(credential, for: query))
-	}
+    // Testing creates a new instance for each test, so every test gets its own keychain item.
+    // This lets the tests run in parallel on the real keychain without interference.
+    let query = GenericPasswordQuery(serviceIdentifier: "dev.panhans.HPKeychain.tests.\(UUID().uuidString)")
 
-	func testBFetching() throws {
+    @Test
+    func addingKeychainItem() throws {
+        try KeychainManager.shared.deleteCredential(with: query)
+        defer { try? KeychainManager.shared.deleteCredential(with: query) }
+
+        try KeychainManager.shared.save(credential, for: query)
+    }
+
+    @Test
+    func fetching() throws {
+        try KeychainManager.shared.deleteCredential(with: query)
+        defer { try? KeychainManager.shared.deleteCredential(with: query) }
+        try KeychainManager.shared.save(credential, for: query)
+
         let storedCredentials = try KeychainManager.shared.credentials(for: query)
 
-        XCTAssertEqual(storedCredentials.count, 1)
+        #expect(storedCredentials.count == 1)
 
-        let firstItem = try XCTUnwrap(storedCredentials.first)
-		XCTAssertEqual(firstItem.username, credential.username)
-		XCTAssertEqual(firstItem.password, credential.password)
-	}
+        let firstItem = try #require(storedCredentials.first)
+        #expect(firstItem.username == credential.username)
+        #expect(firstItem.password == credential.password)
+    }
 
-	func testCUpdating() throws {
-		let updatedCredentials = UsernamePasswordCredential(username: "aNewUsername", password: "someTestingPassword".data(using: .utf8)!)
+    @Test
+    func updating() throws {
+        try KeychainManager.shared.deleteCredential(with: query)
+        defer { try? KeychainManager.shared.deleteCredential(with: query) }
+        try KeychainManager.shared.save(credential, for: query)
 
-		try KeychainManager.shared.update(updatedCredentials, for: query)
-		let storedCredentials = try KeychainManager.shared.credentials(for: query)
+        let updatedCredentials = UsernamePasswordCredential(username: "aNewUsername", password: "someTestingPassword".data(using: .utf8)!)
 
-        XCTAssertEqual(storedCredentials.count, 1)
+        try KeychainManager.shared.update(updatedCredentials, for: query)
+        let storedCredentials = try KeychainManager.shared.credentials(for: query)
 
-        let firstItem = try XCTUnwrap(storedCredentials.first)
-		XCTAssertEqual(firstItem.username, updatedCredentials.username)
-		XCTAssertEqual(firstItem.password, updatedCredentials.password)
-	}
+        #expect(storedCredentials.count == 1)
 
-	func testDDeleting() throws {
-		try KeychainManager.shared.deleteCredential(with: query)
-	}
+        let firstItem = try #require(storedCredentials.first)
+        #expect(firstItem.username == updatedCredentials.username)
+        #expect(firstItem.password == updatedCredentials.password)
+    }
+
+    @Test
+    func deleting() throws {
+        try KeychainManager.shared.deleteCredential(with: query)
+        try KeychainManager.shared.save(credential, for: query)
+
+        try KeychainManager.shared.deleteCredential(with: query)
+
+        #expect(try KeychainManager.shared.credentials(for: query).isEmpty)
+    }
 
 }
