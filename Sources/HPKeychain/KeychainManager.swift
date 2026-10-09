@@ -2,7 +2,7 @@ import Foundation
 
 /// Convenience wrapper for keychain access. Adapted from
 /// [Apple's sample code](https://developer.apple.com/documentation/security/keychain_services/keychain_items)
-public struct KeychainManager {
+public struct KeychainManager: Sendable {
 
     public static let shared = KeychainManager()
 
