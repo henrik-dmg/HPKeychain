@@ -27,9 +27,9 @@ The design separates two concerns: what a credential contains, and how to find i
 - `Credential` (protocol, `Credentials/`): turns itself into keychain attributes through `attributes()`. `UsernamePasswordCredential` is the only implementation (`kSecAttrAccount` plus `kSecValueData`).
 - `CredentialQuery` (protocol, `Queries/`): has a primary associated type `Credential`. It builds the lookup attributes through `queryItems()` and maps a keychain result back to a credential through `credential(from:)`. `GenericPasswordQuery` (service identifier) and `InternetPasswordQuery` (server) are the implementations.
 - `QueryItem` (`Queries/QueryItem.swift`): one keychain key and value pair, for example `Service`, `Server`, `GenericPasswordClass`. `@QueryItemBuilder` is a result builder that lets `queryItems()` list these items declaratively.
-- `KeychainManager.shared`: the only entry point. `save`, `update` and `deleteCredential` take a query. `save` and `update` also take a credential. `credentials(for:)` returns `[C]` for the query's credential type. It returns an empty array, not an error, when nothing matches.
+- `Keychain`: the only entry point. `save`, `update` and `deleteCredential` take a query. `save` and `update` also take a credential. `credentials(for:)` returns `[C]` for the query's credential type. It returns an empty array, not an error, when nothing matches.
 
-To support a new keychain item type, add a `Credential` and a `CredentialQuery`. Add new `QueryItem` types only when you need a new `kSecAttr*` key. Do not change `KeychainManager`.
+To support a new keychain item type, add a `Credential` and a `CredentialQuery`. Add new `QueryItem` types only when you need a new `kSecAttr*` key. Do not change `Keychain`.
 
 `KeychainError` is internal (not `public`), so callers cannot match its cases. `update` maps `errSecItemNotFound` to `.noItem`. `deleteCredential` treats a missing item as success.
 

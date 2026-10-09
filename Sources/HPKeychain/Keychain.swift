@@ -2,11 +2,9 @@ import Foundation
 
 /// Convenience wrapper for keychain access. Adapted from
 /// [Apple's sample code](https://developer.apple.com/documentation/security/keychain_services/keychain_items)
-public struct KeychainManager: Sendable {
+public enum Keychain {
 
-    public static let shared = KeychainManager()
-
-    public func save(_ credential: Credential, for query: any CredentialQuery) throws {
+    public static func save(_ credential: Credential, for query: any CredentialQuery) throws {
         let attributes = try credential.attributes()
         var completeQuery = attributes
 
@@ -20,7 +18,7 @@ public struct KeychainManager: Sendable {
         }
     }
 
-    public func update(_ credential: Credential, for query: any CredentialQuery) throws {
+    public static func update(_ credential: Credential, for query: any CredentialQuery) throws {
         let attributes = try credential.attributes()
         var completeQuery = [String: AnyObject]()
 
@@ -37,7 +35,7 @@ public struct KeychainManager: Sendable {
         }
     }
 
-    public func deleteCredential(with query: any CredentialQuery) throws {
+    public static func deleteAll(matching query: any CredentialQuery) throws {
         var completeQuery = [String: AnyObject]()
 
         for queryItem in try query.queryItems() {
@@ -50,7 +48,7 @@ public struct KeychainManager: Sendable {
         }
     }
 
-    public func credentials<C: Credential>(for query: any CredentialQuery<C>) throws -> [C] {
+    public static func credentials<C: Credential>(for query: any CredentialQuery<C>) throws -> [C] {
         var completeQuery: [String: AnyObject] = [
             kSecReturnPersistentRef as String: kCFBooleanTrue,
             kSecReturnAttributes as String: kCFBooleanTrue,

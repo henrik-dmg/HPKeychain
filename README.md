@@ -1,47 +1,97 @@
 # HPKeychain
 
-A lightweight Swift library for convenient keychain access
+A lightweight Swift library for convenient keychain access.
 
-## Accessing the keychain
+HPKeychain supports iOS 15, tvOS 15, macOS 12, watchOS 9, and visionOS 1.
 
-To fetch a credential from the keychain, all you have to do is call `try Keychain.shared.fetchCredential(for:)`.
-`credentialType` specifies what kind of item you’re looking for. Currently there are two supported credential types. `.generic(service: String)` and `.internetPassword(server: String)`.
+## Installation
 
-### Example
+HPKeychain is available through the Swift Package Manager.
 
-```swift
-let credential = try KeychainManager.shared.fetchCredential(for: .internetPassword(server: "https://github.com"))
-```
+### In a Swift package
 
-## Adding to the keychain
-
-To store a new item in the keychain, simply create a `Credential` instance and pass it to the `KeychainManager`.
-
-### Example
+Add the package to the `dependencies` of your `Package.swift` file:
 
 ```swift
-let credential = Credential(username: "admin", password: "admin", credentialType: .internetPassword(server: "https://github.com"))
-try KeychainManager.shared.storeCredential(credential)
+dependencies: [
+    .package(url: "https://github.com/henrik-dmg/hpkeychain", from: "0.0.1")
+]
 ```
 
-## Updating a keychain item
-
-Updating items is almost as easy adding them in the first place. Either create a new set of credential or update an existing instance by calling `credential.makeUpdatedCredential(username:password:)`. After that you can call `try KeychainManager.shared.updateCredential(_:)`.
-
-### Example
+Then add the product to the target that uses it:
 
 ```swift
-let updatedCredential = existingCredential.makeUpdatedCredential(password: "someMoreSecurePassword")
-try KeychainManager.shared.updateCredential(updatedCredential)
+.target(
+    name: "MyTarget",
+    dependencies: [
+        .product(name: "HPKeychain", package: "hpkeychain")
+    ]
+)
 ```
 
-## Deleting a keychain item
+### In an Xcode project
 
-To delete a keychain item, simply call `try KeychainManager.shared.deleteCredential(for:)`
+1. Open your project in Xcode.
+2. Choose **File > Add Package Dependencies…**.
+3. Enter the URL `https://github.com/henrik-dmg/hpkeychain`.
+4. Click **Add Package**.
+5. Select the target that uses HPKeychain.
 
-### Example
+## Concepts
+
+HPKeychain separates two concerns. A credential describes what the keychain item contains. A query describes how to find the item in the keychain.
+
+- `UsernamePasswordCredential` holds a username and a password (as `Data`).
+- `GenericPasswordQuery` finds an item with a service identifier.
+- `InternetPasswordQuery` finds an item with a server.
+
+`Keychain` is the entry point. Each method takes a query. The methods that write an item also take a credential.
+
+## Saving a credential
+
+To store a new item, call `save(_:for:)` with a credential and a query.
 
 ```swift
-let credentialType = CredentialType.internetPassword(server: "https://github.com")
-try KeychainManager.shared.deleteCredential(for: credentialType)
+let query = InternetPasswordQuery(server: "https://github.com")
+let credential = UsernamePasswordCredential(username: "admin", password: Data("secret".utf8))
+
+try Keychain.save(credential, for: query)
 ```
+
+## Fetching credentials
+
+To read items, call `credentials(for:)` with a query. The method returns an array of credentials for the type of the query. The array is empty when no item matches.
+
+```swift
+let query = GenericPasswordQuery(serviceIdentifier: "com.example.myapp")
+let credentials = try Keychain.credentials(for: query)
+
+if let credential = credentials.first {
+    print(credential.username)
+}
+```
+
+## Updating a credential
+
+To change an existing item, call `update(_:for:)` with the new credential and the query that finds the item. The method throws an error when no item matches.
+
+```swift
+let query = InternetPasswordQuery(server: "https://github.com")
+let updatedCredential = UsernamePasswordCredential(username: "admin", password: Data("someMoreSecurePassword".utf8))
+
+try Keychain.update(updatedCredential, for: query)
+```
+
+## Deleting credentials
+
+To delete items, call `deleteAll(matching:)` with a query. The method deletes all items that match. It does not throw an error when no item matches.
+
+```swift
+let query = InternetPasswordQuery(server: "https://github.com")
+
+try Keychain.deleteAll(matching: query)
+```
+
+## Supporting a new item type
+
+To support a new type of keychain item, add a type that conforms to `Credential` and a type that conforms to `CredentialQuery`. You do not change `Keychain`.

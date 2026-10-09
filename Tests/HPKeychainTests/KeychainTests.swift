@@ -3,7 +3,7 @@ import Testing
 
 @testable import HPKeychain
 
-struct HPKeychainTests {
+struct KeychainTests {
 
     let credential = UsernamePasswordCredential(username: "hpanhans", password: "someTestingPassword".data(using: .utf8)!)
 
@@ -13,19 +13,19 @@ struct HPKeychainTests {
 
     @Test
     func addingKeychainItem() throws {
-        try KeychainManager.shared.deleteCredential(with: query)
-        defer { try? KeychainManager.shared.deleteCredential(with: query) }
+        try Keychain.deleteAll(matching: query)
+        defer { try? Keychain.deleteAll(matching: query) }
 
-        try KeychainManager.shared.save(credential, for: query)
+        try Keychain.save(credential, for: query)
     }
 
     @Test
     func fetching() throws {
-        try KeychainManager.shared.deleteCredential(with: query)
-        defer { try? KeychainManager.shared.deleteCredential(with: query) }
-        try KeychainManager.shared.save(credential, for: query)
+        try Keychain.deleteAll(matching: query)
+        defer { try? Keychain.deleteAll(matching: query) }
+        try Keychain.save(credential, for: query)
 
-        let storedCredentials = try KeychainManager.shared.credentials(for: query)
+        let storedCredentials = try Keychain.credentials(for: query)
 
         #expect(storedCredentials.count == 1)
 
@@ -36,14 +36,14 @@ struct HPKeychainTests {
 
     @Test
     func updating() throws {
-        try KeychainManager.shared.deleteCredential(with: query)
-        defer { try? KeychainManager.shared.deleteCredential(with: query) }
-        try KeychainManager.shared.save(credential, for: query)
+        try Keychain.deleteAll(matching: query)
+        defer { try? Keychain.deleteAll(matching: query) }
+        try Keychain.save(credential, for: query)
 
         let updatedCredentials = UsernamePasswordCredential(username: "aNewUsername", password: "someTestingPassword".data(using: .utf8)!)
 
-        try KeychainManager.shared.update(updatedCredentials, for: query)
-        let storedCredentials = try KeychainManager.shared.credentials(for: query)
+        try Keychain.update(updatedCredentials, for: query)
+        let storedCredentials = try Keychain.credentials(for: query)
 
         #expect(storedCredentials.count == 1)
 
@@ -54,12 +54,12 @@ struct HPKeychainTests {
 
     @Test
     func deleting() throws {
-        try KeychainManager.shared.deleteCredential(with: query)
-        try KeychainManager.shared.save(credential, for: query)
+        try Keychain.deleteAll(matching: query)
+        try Keychain.save(credential, for: query)
 
-        try KeychainManager.shared.deleteCredential(with: query)
+        try Keychain.deleteAll(matching: query)
 
-        #expect(try KeychainManager.shared.credentials(for: query).isEmpty)
+        #expect(try Keychain.credentials(for: query).isEmpty)
     }
 
 }
