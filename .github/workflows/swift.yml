@@ -1,4 +1,4 @@
-name: Code Testing
+name: Tests
 
 on:
   push:
@@ -7,15 +7,22 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  test:
     runs-on: macos-latest
 
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1
+      - name: Setup Swift
+        uses: swift-actions/setup-swift@v3
         with:
-          xcode-version: latest
-      - uses: actions/checkout@v2
-      - name: Build
-        run: swift build -v
-      - name: Run tests
+          swift-version: "6.4"
+      - name: Checkout Repo
+        uses: actions/checkout@v7
+      - name: Restore Build Cache
+        uses: actions/cache@v6
+        with:
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+      - name: Run Tests
         run: swift test -v
