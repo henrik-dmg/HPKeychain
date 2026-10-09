@@ -14,7 +14,7 @@ Add the package to the `dependencies` of your `Package.swift` file:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/henrik-dmg/hpkeychain", from: "0.0.1")
+    .package(url: "https://github.com/henrik-dmg/hpkeychain", from: "1.0.0")
 ]
 ```
 
